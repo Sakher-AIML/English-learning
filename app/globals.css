@@ -1,0 +1,47 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary: #4f46e5;
+  --secondary: #f59e0b;
+  --success: #10b981;
+  --danger: #ef4444;
+  --bg: #fafafa;
+  --surface: #ffffff;
+  --surface-2: #f3f4f6;
+  --text-1: #111827;
+  --text-2: #6b7280;
+  --border: #e5e7eb;
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  body {
+    @apply font-body;
+    color: var(--text-1);
+    min-height: 100vh;
+    background:
+      radial-gradient(circle at 15% -10%, rgba(79, 70, 229, 0.18), transparent 34%),
+      radial-gradient(circle at 85% 110%, rgba(245, 158, 11, 0.14), transparent 32%),
+      var(--bg);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-display), sans-serif;
+  }
+}
+
+@layer utilities {
+  .surface-card {
+    @apply rounded-2xl border bg-surface shadow-sm;
+  }
+}
