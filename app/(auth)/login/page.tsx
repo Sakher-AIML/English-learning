@@ -1,36 +1,46 @@
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
+"use client";
+
+import { useState } from "react";
+import { createSupabaseBrowserClient } from "@/lib/supabase";
 
 export default function LoginPage() {
+  const supabase = createSupabaseBrowserClient();
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleLogin = async (e: any) => {
+    e.preventDefault();
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      alert(error.message);
+      console.log(error);
+    } else {
+      alert("Login successful");
+      console.log(data);
+    }
+  };
+
   return (
-    <section className="space-y-6">
-      <header className="space-y-2">
-        <p className="text-sm font-semibold text-primary">Welcome back</p>
-        <h1 className="text-3xl font-extrabold">Log in to LinguaAI</h1>
-      </header>
+    <form onSubmit={handleLogin} className="space-y-4">
+      <input
+        type="email"
+        placeholder="Email"
+        onChange={(e) => setEmail(e.target.value)}
+      />
 
-      <form className="space-y-4">
-        <label className="block space-y-2 text-sm font-semibold text-text-1">
-          Email
-          <input type="email" className="w-full rounded-xl border bg-white px-3 py-2" />
-        </label>
-        <label className="block space-y-2 text-sm font-semibold text-text-1">
-          Password
-          <input type="password" className="w-full rounded-xl border bg-white px-3 py-2" />
-        </label>
+      <input
+        type="password"
+        placeholder="Password"
+        onChange={(e) => setPassword(e.target.value)}
+      />
 
-        <Button className="w-full">Continue</Button>
-        <Button variant="secondary" className="w-full">
-          Continue with Google
-        </Button>
-      </form>
-
-      <p className="text-center text-sm text-text-2">
-        New here?{" "}
-        <Link href="/signup" className="font-semibold text-primary">
-          Create an account
-        </Link>
-      </p>
-    </section>
+      <button type="submit">Login</button>
+    </form>
   );
 }

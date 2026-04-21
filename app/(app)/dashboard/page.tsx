@@ -1,6 +1,7 @@
 import { DailyReviewBanner } from "@/components/dashboard/DailyReviewBanner";
 import { StatCard } from "@/components/dashboard/StatCard";
 import { StreakBadge } from "@/components/dashboard/StreakBadge";
+import { UpgradePlanCard } from "@/components/dashboard/UpgradePlanCard";
 import { XPBar } from "@/components/dashboard/XPBar";
 
 export default function DashboardPage() {
@@ -22,6 +23,7 @@ export default function DashboardPage() {
       </div>
 
       <DailyReviewBanner dueCount={12} />
+      <UpgradePlanCard />
       <XPBar currentXP={780} nextLevelXP={1000} />
     </section>
   );

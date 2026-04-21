@@ -17,11 +17,11 @@ You are building **LinguaAI** — a web-based English learning app for non-Engli
 - **Animation:** Framer Motion
 - **State:** Zustand (global) + TanStack Query (server data)
 - **Database & Auth:** Supabase (PostgreSQL + RLS + Auth)
-- **AI:** Anthropic Claude API (`claude-sonnet-4-20250514`) for conversation
-- **Speech:** OpenAI Whisper API for speech-to-text and pronunciation
-- **TTS:** Web Speech API (with OpenAI TTS as fallback)
+- **AI:** OpenRouter API with Gemini-family models for conversation
+- **Speech:** Google Gemini API for speech-to-text and pronunciation analysis
+- **TTS:** Web Speech API (with Gemini TTS as optional fallback)
 - **Charts:** Recharts
-- **Payments:** Stripe
+- **Payments:** Paddle
 - **Rate limiting:** Upstash Redis
 - **Deployment:** Vercel
 
@@ -70,8 +70,8 @@ Scaffold the project with this structure:
 /lib
   /srs.ts                          # SM-2 algorithm
   /supabase.ts                     # Supabase client
-  /claude.ts                       # Claude API wrapper
-  /whisper.ts                      # Whisper API wrapper
+  /openrouter.ts                   # OpenRouter API wrapper
+  /gemini.ts                       # Gemini API wrapper
   /audio.ts                        # MediaRecorder helpers
 /hooks
   /useConversation.ts
@@ -210,7 +210,7 @@ Rules:
 - Use vocabulary appropriate for ${cefrLevel} level
 - Be warm, patient, and encouraging
 `
-// Use claude-sonnet-4-20250514, max_tokens: 300, temperature: 0.7
+// Use google/gemini-2.5-flash via OpenRouter, max_tokens: 300, temperature: 0.7
 ```
 
 ### Conversation UI (`/conversation`)
@@ -221,7 +221,7 @@ Build a full-height chat interface:
 - Show gentle correction in AI message with green highlight: original error struck through, correction shown
 - Animated typing indicator (3 bouncing dots) while waiting for AI response
 - Bottom input: text field + send button + mic button
-- Voice mode: use MediaRecorder API, send to Whisper, display transcript before sending
+- Voice mode: use MediaRecorder API, send to Gemini, display transcript before sending
 - "End Session" button → triggers `/api/conversation/end` → shows SessionSummary modal
 
 ### Session Summary Modal
@@ -292,7 +292,7 @@ export function updateCard(card: CardSRS, rating: Rating): CardSRS {
 
 ```typescript
 // Body: FormData with { audio: Blob, targetText: string }
-// 1. Send audio to OpenAI Whisper for transcription
+// 1. Send audio to Gemini for transcription
 // 2. Compare transcript to targetText using word-level diff
 // 3. Calculate score: (matching_words / total_words) * 100
 // 4. Return: { score: number, transcript: string, wordFeedback: WordFeedback[], tip: string }
@@ -383,7 +383,7 @@ if (userPlan === 'free' && count > limits[feature]) {
 When limit is reached, show an upgrade modal:
 - "You've used all 3 free conversations today"
 - Feature list of Pro plan
-- "Upgrade to Pro — $9.99/mo" button → Stripe checkout
+- "Upgrade to Pro — $9.99/mo" button → Paddle checkout
 
 ---
 
@@ -404,13 +404,15 @@ Use Supabase Auth:
 NEXT_PUBLIC_SUPABASE_URL
 NEXT_PUBLIC_SUPABASE_ANON_KEY
 SUPABASE_SERVICE_ROLE_KEY
-ANTHROPIC_API_KEY
-OPENAI_API_KEY
+GEMINI_API_KEY
+OPENROUTER_API_KEY
 UPSTASH_REDIS_REST_URL
 UPSTASH_REDIS_REST_TOKEN
-STRIPE_SECRET_KEY
-STRIPE_WEBHOOK_SECRET
-NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+PADDLE_API_KEY
+PADDLE_VENDOR_ID
+PADDLE_WEBHOOK_SECRET
+NEXT_PUBLIC_PADDLE_CLIENT_TOKEN
+NEXT_PUBLIC_PADDLE_PRICE_ID
 ```
 
 ---
@@ -425,10 +427,10 @@ NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
 6. Onboarding: 5-step assessment flow
 7. Dashboard: stat cards, streak, daily review banner, feature cards
 8. Flashcards: SM-2 engine + card UI + flip animation + deck completion
-9. Conversation: topic selector + chat UI + Claude API integration + session summary
-10. Pronunciation: recorder + Whisper API + score display + word breakdown
+9. Conversation: topic selector + chat UI + OpenRouter integration + session summary
+10. Pronunciation: recorder + Gemini API + score display + word breakdown
 11. Progress page: charts + history + achievements
-12. Freemium: Redis rate limiting + upgrade modal + Stripe integration
+12. Freemium: Redis rate limiting + upgrade modal + Paddle integration
 
 ---
 

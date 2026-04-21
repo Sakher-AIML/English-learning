@@ -153,7 +153,7 @@ Appears in daily review → User rates difficulty → SM-2 schedules next review
 
 | Risk | Mitigation |
 |---|---|
-| Speech API accuracy varies by accent | Use Whisper (OpenAI) for high accent tolerance |
+| Speech API accuracy varies by accent | Use Gemini multimodal transcription with accent-tuned prompting |
 | High AI API costs on free tier | Rate limit conversations; use caching for common responses |
 | User drop-off after day 3 | Streak system + daily push notifications via email |
 | Solo dev bandwidth | Strict MVP scope; use existing libraries (SM-2, shadcn/ui) |
@@ -166,8 +166,8 @@ Appears in daily review → User rates difficulty → SM-2 schedules next review
 |---|---|---|
 | Setup & Auth | Week 1 | Next.js app, Supabase auth, DB schema |
 | Flashcard SRS | Week 2–3 | SM-2 engine, card UI, deck management |
-| AI Conversation | Week 3–4 | Chat UI, Claude integration, level adaptation |
-| Pronunciation Tools | Week 5–6 | Whisper STT, scoring, waveform UI |
+| AI Conversation | Week 3–4 | Chat UI, OpenRouter integration, level adaptation |
+| Pronunciation Tools | Week 5–6 | Gemini audio analysis, scoring, waveform UI |
 | Dashboard + Gamification | Week 7 | XP, streaks, progress charts |
-| Freemium + Stripe | Week 8 | Paywall, subscription management |
+| Freemium + Paddle | Week 8 | Paywall, subscription management |
 | Beta Launch | Week 9 | Public launch, feedback loop |

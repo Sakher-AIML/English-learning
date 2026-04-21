@@ -1,7 +1,7 @@
 # LinguaAI — Architecture Document
 
 **Version:** 1.0  
-**Stack:** Next.js 14 (App Router), React, Supabase, Claude API, OpenAI Whisper  
+**Stack:** Next.js 14 (App Router), React, Supabase, Google Gemini API, OpenRouter API, Paddle  
 **Deployment:** Vercel  
 
 ---
@@ -20,9 +20,9 @@
 └──────┬──────────────┬───────────────────┬───────────┘
        │              │                   │
 ┌──────▼──────┐ ┌─────▼──────┐  ┌────────▼────────┐
-│ Anthropic   │ │  OpenAI    │  │    Supabase     │
-│ Claude API  │ │ Whisper    │  │  (DB + Auth +   │
-│ (Chat/Conv) │ │ (STT/Pron) │  │   Storage)      │
+│ OpenRouter  │ │  Gemini    │  │    Supabase     │
+│ (Chat/Tutor)│ │ (Text+Audio│  │  (DB + Auth +   │
+│             │ │  Analysis) │  │   Storage)      │
 └─────────────┘ └────────────┘  └─────────────────┘
 ```
 
@@ -180,7 +180,7 @@ All tables have RLS enabled — users can only read/write their own rows.
 
 ## 5. AI & External Services
 
-### 5.1 Claude API (Anthropic) — Conversation Partner
+### 5.1 OpenRouter API — Conversation Partner
 ```typescript
 // System prompt strategy
 const systemPrompt = `
@@ -191,21 +191,21 @@ const systemPrompt = `
   - Keep responses concise (2-4 sentences)
   - After 10 exchanges, end gracefully
 `
-// Model: claude-sonnet-4-20250514
+// Model: google/gemini-2.5-flash (via OpenRouter)
 // Max tokens: 300 per response
 // Temperature: 0.7
 ```
 
-### 5.2 OpenAI Whisper — Speech-to-Text + Pronunciation
+### 5.2 Google Gemini API — Speech-to-Text + Pronunciation
 - User records audio in browser (MediaRecorder API)
 - Audio blob sent to `/api/pronunciation/score`
-- Server sends to Whisper for transcription
+- Server sends audio + prompt to Gemini for transcript and scoring JSON
 - Transcription compared to target text using phoneme-level diff
 - Score calculated: (matched_phonemes / total_phonemes) * 100
 
 ### 5.3 Text-to-Speech (for flashcards + shadowing)
 - **Web Speech API** (free, browser-native) for flashcard audio
-- Fallback: **OpenAI TTS API** for higher quality pronunciation examples
+- Optional fallback: **Gemini TTS endpoint** if needed
 
 ### 5.4 Supabase
 - **Auth:** Email/password + Google OAuth
@@ -259,7 +259,7 @@ function sm2(card: Card, rating: Rating): Card {
 - User's `plan` field stored in `profiles` table
 - Rate limits checked in API middleware via **Upstash Redis** counters
 - Daily counters reset at midnight UTC
-- Stripe webhooks update `plan` field on subscription events
+- Paddle webhooks update `plan` field on subscription events
 
 ```
 Free limits (enforced server-side):
@@ -277,22 +277,24 @@ Free limits (enforced server-side):
 | **Vercel** | Next.js hosting, edge functions |
 | **Supabase** | Database, auth, file storage |
 | **Upstash Redis** | Rate limiting counters |
-| **Stripe** | Subscription billing |
-| **Anthropic API** | AI conversation |
-| **OpenAI API** | Whisper STT, TTS |
+| **Paddle** | Subscription billing |
+| **OpenRouter API** | AI conversation + coaching refinement |
+| **Google Gemini API** | Speech analysis, transcription, fallback generation |
 
 ### Environment Variables
 ```
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
-ANTHROPIC_API_KEY=
-OPENAI_API_KEY=
+GEMINI_API_KEY=
+OPENROUTER_API_KEY=
 UPSTASH_REDIS_REST_URL=
 UPSTASH_REDIS_REST_TOKEN=
-STRIPE_SECRET_KEY=
-STRIPE_WEBHOOK_SECRET=
-NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=
+PADDLE_API_KEY=
+PADDLE_VENDOR_ID=
+PADDLE_WEBHOOK_SECRET=
+NEXT_PUBLIC_PADDLE_CLIENT_TOKEN=
+NEXT_PUBLIC_PADDLE_PRICE_ID=
 ```
 
 ---
